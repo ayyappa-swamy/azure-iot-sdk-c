@@ -11,6 +11,8 @@
 #include "azure_c_shared_utility/platform.h"
 #include "iothubtransportmqtt.h"
 
+#include <vld.h>
+
 #ifdef MBED_BUILD_TIMESTAMP
 #include "certs.h"
 #endif // MBED_BUILD_TIMESTAMP
@@ -18,13 +20,13 @@
 /*String containing Hostname, Device Id & Device Key in the format:                         */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>"                */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessSignature=<device_sas_token>"    */
-static const char* connectionString = "[device connection string]";
+static const char* connectionString = "HostName=iot-sdks-test.azure-devices.net;DeviceId=jebrandoDevice;SharedAccessKey=P3YJYsVQwytQP2JrLca9lSCvyYfPDVjiCZR+5apSQ7c=";
 
 static int callbackCounter;
 static char msgText[1024];
 static char propText[1024];
 static bool g_continueRunning;
-#define MESSAGE_COUNT 5
+#define MESSAGE_COUNT       1
 #define DOWORK_LOOP_NUM     3
 
 
@@ -170,6 +172,10 @@ void iothub_client_sample_mqtt_run(void)
                         }
                         else
                         {
+
+                            //(void)IoTHubMessage_SetMessageId(messages[iterator].messageHandle, "MSG_ID");
+                            (void)IoTHubMessage_SetCorrelationId(messages[iterator].messageHandle, "CORE_ID");
+
                             messages[iterator].messageTrackingId = iterator;
                             MAP_HANDLE propMap = IoTHubMessage_Properties(messages[iterator].messageHandle);
                             (void)sprintf_s(propText, sizeof(propText), temperature > 28 ? "true" : "false");
@@ -187,6 +193,7 @@ void iothub_client_sample_mqtt_run(void)
                                 (void)printf("IoTHubClient_LL_SendEventAsync accepted message [%d] for transmission to IoT Hub.\r\n", (int)iterator);
                             }
                         }
+
                     }
                     IoTHubClient_LL_DoWork(iotHubClientHandle);
                     ThreadAPI_Sleep(1);
