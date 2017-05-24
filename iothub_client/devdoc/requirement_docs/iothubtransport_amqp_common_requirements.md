@@ -413,22 +413,32 @@ int IoTHubTransport_AMQP_Common_SetRetryPolicy(TRANSPORT_LL_HANDLE handle, IOTHU
 
 ### IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin
 ```c
-int IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin(IOTHUB_DEVICE_HANDLE handle, IOTHUB_DEVICE_TWIN_STATE subscribe_state)
+int IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin(IOTHUB_DEVICE_HANDLE handle)
 ```
 
-`IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` subscribes to DeviceTwin's messages. Not implemented at the moment.
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_131: [**If `handle` is NULL, `IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` shall fail and return non-zero.**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_132: [**If `instance->twin_messenger` is NULL, it shall be set using twin_messenger_create()**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_133: [**If twin_messenger_create() fails, `IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` shall fail and return non-zero.**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_134: [**`IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` shall invoke twin_messenger_subscribe(), passing `on_twin_message_received_callback`**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_135: [**If twin_messenger_subscribe() fails, `IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` shall fail and return non-zero.**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_136: [**If no errors occur, `IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` shall return zero.**]**
 
-**SRS_IOTHUBTRANSPORT_AMQP_COMMON_02_009: [** `IoTHubTransport_AMQP_Common_Subscribe_DeviceTwin` shall return a non-zero value. **]**
+#### on_twin_message_received_callback
+```
+void on_twin_message_received_callback()
+``` 
 
+// TODO: fill requirements
 
 ### IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin
 ```c
-void IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin(IOTHUB_DEVICE_HANDLE handle, IOTHUB_DEVICE_TWIN_STATE subscribe_state)
+void IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin(IOTHUB_DEVICE_HANDLE handle)
 ```
 
-`IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin` unsubscribes from DeviceTwin's messages. Not implemented.
-
-**SRS_IOTHUBTRANSPORT_AMQP_COMMON_02_010: [** `IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin` shall return. **]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_131: [**If `handle` is NULL, `IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin` shall return.**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_131: [**If `instance->twin_messenger` is NULL, `IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin` shall return**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_131: [**`IoTHubTransport_AMQP_Common_Unsubscribe_DeviceTwin` shall invoke twin_messenger_unsubscribe()**]**
+**SRS_IOTHUBTRANSPORT_AMQP_COMMON_09_131: [**If twin_messenger_subscribe() fails, the error shall be ignored**]**
 
 
 ### IoTHubTransport_AMQP_Common_Subscribe_DeviceMethod

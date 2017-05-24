@@ -3,8 +3,16 @@
 
 #this is CMakeLists.txt for devicemethod_simplesample sample
 
-if(NOT ${use_mqtt})
-	message(FATAL_ERROR "devicemethod_simplesample being generated without mqtt support")
+if(NOT ${use_mqtt} AND NOT ${use_amqp})
+	message(FATAL_ERROR "devicemethod_simplesample being generated without mqtt or amqp support")
+endif()
+
+if(${use_mqtt})
+	add_definitions(-DUSE_MQTT)
+endif()
+
+if(${use_amqp})
+	add_definitions(-DUSE_AMQP)
 endif()
 
 compileAsC99()
@@ -29,12 +37,30 @@ IF(WIN32)
 ENDIF(WIN32)
 
 include_directories(. ${SHARED_UTIL_INC_FOLDER} ${IOTHUB_CLIENT_INC_FOLDER})
-#link_directories(${whatIsBuilding}_dll ${SHARED_UTIL_LIB_DIR})
 
 add_executable(devicemethod_simplesample ${devicemethod_simplesample_c_files} ${devicemethod_simplesample_h_files})
 
-target_link_libraries(devicemethod_simplesample 
-	iothub_client_mqtt_transport
+if(${use_mqtt})
+	include_directories(. ${IOTHUB_CLIENT_MQTT_TRANSPORT_INC_FOLDER})
+
+	target_link_libraries(devicemethod_simplesample
+		iothub_client_mqtt_transport
+		)
+endif()
+
+if(${use_amqp})
+	include_directories(. ${IOTHUB_CLIENT_AMQP_TRANSPORT_INC_FOLDER})
+
+	target_link_libraries(devicemethod_simplesample
+		iothub_client_amqp_transport
+		)
+endif()
+
+if (${use_amqp})
+	linkUAMQP(devicemethod_simplesample)
+endif()
+
+target_link_libraries(devicemethod_simplesample
 	serializer 
 	iothub_client
 	)

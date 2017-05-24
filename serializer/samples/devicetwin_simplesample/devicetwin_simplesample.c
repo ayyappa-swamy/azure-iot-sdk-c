@@ -6,14 +6,19 @@
 
 #include "serializer_devicetwin.h"
 #include "iothub_client.h"
+//#ifdef USE_MQTT
 #include "iothubtransportmqtt.h"
+//#endif
+//#ifdef USE_AMQP
+#include "iothubtransportamqp.h"
+//#endif
 #include "azure_c_shared_utility/threadapi.h"
 #include "parson.h"
 #include "azure_c_shared_utility/platform.h"
 
 /*String containing Hostname, Device Id & Device Key in the format:             */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>"    */
-static const char* connectionString = "HostName=...";
+static const char* connectionString = "HA!";
 
 // Define the Model - it is a car.
 BEGIN_NAMESPACE(Contoso);
@@ -130,15 +135,17 @@ void device_twin_simple_sample_run(void)
                     else
                     {
                         printf("Reported state will be send to IoTHub\n");
+
+						
                     }
 
                     printf("press ENTER to end the sample\n");
                     (void)getchar();
 
-                }
-                IoTHubDeviceTwin_DestroyCar(car);
-            }
-            IoTHubClient_Destroy(iotHubClientHandle);
+					IoTHubDeviceTwin_DestroyCar(car);
+				}
+				IoTHubClient_Destroy(iotHubClientHandle);
+			}
         }
     }
     platform_deinit();
