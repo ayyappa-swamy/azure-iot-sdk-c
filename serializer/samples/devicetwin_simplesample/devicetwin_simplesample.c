@@ -18,7 +18,7 @@
 
 /*String containing Hostname, Device Id & Device Key in the format:             */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>"    */
-static const char* connectionString = "HA!";
+static const char* connectionString = "HostName=...";
 
 // Define the Model - it is a car.
 BEGIN_NAMESPACE(Contoso);
@@ -67,12 +67,17 @@ METHODRETURN_HANDLE getCarVIN(Car* car)
     return result;
 }
 
-void deviceTwinCallback(int status_code, void* userContextCallback)
+void deviceTwinReportStateCallback(int status_code, void* userContextCallback)
 {
     (void)(userContextCallback);
     printf("IoTHub: reported properties delivered with status_code = %u\n", status_code);
 }
 
+static void deviceTwinGetStateCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsigned char* payLoad, size_t size, void* userContextCallback)
+{
+    (void)userContextCallback;
+    printf("Device Twin properties received: update=%s payload=%s, size=%d\n", ENUM_TO_STRING(DEVICE_TWIN_UPDATE_STATE, update_state), payLoad, size);
+}
 
 void onDesiredMaxSpeed(void* argument)
 {
@@ -128,7 +133,7 @@ void device_twin_simple_sample_run(void)
                     car->state.vanityPlate = "1I1";
 
                     /*sending the values to IoTHub*/
-                    if (IoTHubDeviceTwin_SendReportedStateCar(car, deviceTwinCallback, NULL) != IOTHUB_CLIENT_OK)
+                    if (IoTHubDeviceTwin_SendReportedStateCar(car, deviceTwinReportStateCallback, NULL) != IOTHUB_CLIENT_OK)
                     {
                         (void)printf("Failed sending serialized reported state\n");
                     }
@@ -136,7 +141,10 @@ void device_twin_simple_sample_run(void)
                     {
                         printf("Reported state will be send to IoTHub\n");
 
-						
+                        if (IoTHubClient_SetDeviceTwinCallback(iotHubClientHandle, deviceTwinGetStateCallback, NULL) != IOTHUB_CLIENT_OK)
+                        {
+                            (void)printf("Failed subscribing for device twin properties\n");
+                        }
                     }
 
                     printf("press ENTER to end the sample\n");
